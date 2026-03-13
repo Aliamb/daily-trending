@@ -60,6 +60,7 @@ function getFallbackThumb(platform) {
 /* ===== Render: YouTube & Shorts (thumbnail cards) ===== */
 function renderYouTube(items, label, platform) {
   var fallback = getFallbackThumb(platform);
+  var isMainYT = (platform === "youtube");
   var html = '<div class="section-header">';
   html += '<h2 class="section-title">' + escapeHtml(label) + '</h2>';
   html += '<span class="section-count">Top 20</span>';
@@ -69,16 +70,19 @@ function renderYouTube(items, label, platform) {
   items.forEach(function (item) {
     var thumbSrc = item.thumbnail || fallback;
     var itemUrl = item.url || "#";
+    var badgeText = isMainYT && item.countries
+      ? '\uD83C\uDF0D ' + item.countries + ' countries'
+      : escapeHtml(item.views) + ' views';
     html += '<a href="' + escapeAttr(itemUrl) + '" target="_blank" rel="noopener noreferrer" class="card-link">';
     html += '<article class="card">';
     html += '  <div class="card-thumb">';
     html += '    <img src="' + escapeAttr(thumbSrc) + '" alt="' + escapeAttr(item.title) + '" loading="lazy" width="480" height="270" onerror="this.src=\'' + escapeAttr(fallback) + '\'">';
     html += '    <span class="card-rank">' + item.rank + '</span>';
-    html += '    <span class="card-views-badge">' + escapeHtml(item.views) + ' views</span>';
+    html += '    <span class="card-views-badge">' + badgeText + '</span>';
     html += '  </div>';
     html += '  <div class="card-body">';
     html += '    <h3 class="card-title">' + escapeHtml(item.title) + '</h3>';
-    html += '    <p class="card-meta"><span>' + escapeHtml(item.channel || item.creator || "") + '</span></p>';
+    html += '    <p class="card-meta"><span>' + escapeHtml(item.channel || item.creator || item.highlights || "") + '</span></p>';
     html += '  </div>';
     html += '</article>';
     html += '</a>';
@@ -239,7 +243,7 @@ function renderTab(tabName) {
 
   switch (tabName) {
     case "youtube":
-      html = renderYouTube(TRENDING_DATA.youtube, "YouTube Trending", "youtube");
+      html = renderYouTube(TRENDING_DATA.youtube, "YouTube Most Popular Worldwide", "youtube");
       break;
     case "shorts":
       html = renderYouTube(TRENDING_DATA.shorts, "YouTube Shorts", "shorts");
