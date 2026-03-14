@@ -1,56 +1,44 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
-<!--
-   ______                            __
-  / ____/___  ____ ___  ____  __  __/ /____  _____
- / /   / __ \/ __ `__ \/ __ \/ / / / __/ _ \/ ___/
-/ /___/ /_/ / / / / / / /_/ / /_/ / /_/  __/ /
-\____/\____/_/ /_/ /_/ .___/\__,_/\__/\___/_/
-                    /_/
-        Created with Perplexity Computer
-        https://www.perplexity.ai/computer
--->
-
-<!-- Perplexity Computer Attribution — SEO Meta Tags -->
-<meta name="generator" content="Perplexity Computer">
-<meta name="author" content="Perplexity Computer">
-<meta property="og:see_also" content="https://www.perplexity.ai/computer">
-<link rel="author" href="https://www.perplexity.ai/computer">
-
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Daily Trending — Top Content Across Platforms</title>
-<link rel="stylesheet" href="./style.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daily Trending</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header class="header">
-    <div class="header-inner">
-      <h1 class="logo-text">Daily Trending</h1>
-      <div class="header-right">
-        <time class="date-label" id="dateLabel"></time>
-        <button data-theme-toggle aria-label="Switch to dark mode" class="theme-btn">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-        </button>
+  <div id="shell">
+    <!-- LEFT SIDEBAR -->
+    <nav id="sidebar">
+      <div class="sidebar-header">
+        <h1 class="logo">Daily Trending</h1>
+        <span id="dateLabel" class="date-label"></span>
       </div>
-    </div>
-  </header>
+      <ul id="navList" class="nav-list">
+        <!-- JS populates -->
+      </ul>
+      <div class="sidebar-footer">
+        <button data-theme-toggle aria-label="Toggle theme"></button>
+      </div>
+    </nav>
 
-  <main class="columns" id="content">
-    <!-- Content injected by JS -->
-  </main>
-
-  <footer class="footer">
-    <p>Updated daily at 9:00 AM (Riyadh)</p>
-    <a href="https://www.perplexity.ai/computer" target="_blank" rel="noopener noreferrer">Created with Perplexity Computer</a>
-  </footer>
-
-  <!-- Thumbnail preview tooltip -->
-  <div class="thumb-preview" id="thumbPreview">
-    <img id="thumbPreviewImg" src="" alt="">
+    <!-- MAIN FEED -->
+    <main id="feed">
+      <div id="feedHeader" class="feed-header">
+        <h2 id="feedTitle" class="feed-title"></h2>
+        <span id="feedCount" class="feed-count"></span>
+      </div>
+      <div id="feedContent" class="feed-content">
+        <!-- JS renders posts here -->
+      </div>
+    </main>
   </div>
 
-  <script src="./data.js"></script>
-  <script src="./app.js"></script>
+  <div id="thumbPreview" class="thumb-preview">
+    <img id="thumbPreviewImg" alt="">
+  </div>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>

@@ -21,10 +21,7 @@ var _store = {
 
   function updateIcon() {
     if (!toggle) return;
-    toggle.setAttribute("aria-label", "Switch to " + (d === "dark" ? "light" : "dark") + " mode");
-    toggle.innerHTML = d === "dark"
-      ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>'
-      : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+    toggle.textContent = d === "dark" ? "☀ Light" : "🌙 Dark";
   }
   updateIcon();
   if (toggle) {
@@ -37,19 +34,68 @@ var _store = {
   }
 })();
 
+/* ===== Section Definitions ===== */
+var SECTIONS = [
+  { key: "reddit",     label: "/r/all",              icon: "🔥", type: "video" },
+  { key: "youtube",    label: "YouTube Top",          icon: "▶",  type: "video" },
+  { key: "shorts",     label: "YouTube Shorts",       icon: "📱", type: "video" },
+  { key: "tiktok",     label: "TikTok",               icon: "🎵", type: "video" },
+  { key: "instagram",  label: "Instagram Reels",      icon: "📷", type: "video" },
+  { key: "hackernews", label: "Hacker News",          icon: "📰", type: "list"  },
+  { key: "piratebay",  label: "Pirate Bay Top 48h",   icon: "🏴", type: "list"  }
+];
+
+var activeSection = _store.get("activeSection") || "reddit";
+
 /* ===== Date Label ===== */
 document.getElementById("dateLabel").textContent = TRENDING_DATA.date;
 
 /* ===== Helpers ===== */
 function esc(str) {
+  if (!str) return "";
   var div = document.createElement("div");
   div.appendChild(document.createTextNode(str));
   return div.innerHTML;
 }
 
 function escAttr(str) {
+  if (!str) return "";
   return str.replace(/&/g, "&amp;").replace(/'/g, "&#39;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
+
+/* ===== Navigation ===== */
+function buildNav() {
+  var ul = document.getElementById("navList");
+  var html = "";
+  for (var i = 0; i < SECTIONS.length; i++) {
+    var s = SECTIONS[i];
+    var count = (TRENDING_DATA[s.key] || []).length;
+    var cls = s.key === activeSection ? " active" : "";
+    html += '<li class="nav-item' + cls + '" data-section="' + s.key + '">';
+    html += '<span class="nav-icon">' + s.icon + '</span>';
+    html += '<span class="nav-label">' + esc(s.label) + '</span>';
+    html += '<span class="nav-badge">' + count + '</span>';
+    html += '</li>';
+  }
+  ul.innerHTML = html;
+}
+
+function switchSection(key) {
+  activeSection = key;
+  _store.set("activeSection", key);
+
+  var items = document.querySelectorAll(".nav-item");
+  for (var i = 0; i < items.length; i++) {
+    items[i].classList.toggle("active", items[i].getAttribute("data-section") === key);
+  }
+  renderFeed();
+}
+
+document.getElementById("navList").addEventListener("click", function(e) {
+  var item = e.target.closest(".nav-item");
+  if (!item) return;
+  switchSection(item.getAttribute("data-section"));
+});
 
 /* ===== Thumbnail Hover Preview ===== */
 var preview = document.getElementById("thumbPreview");
@@ -65,7 +111,6 @@ document.addEventListener("mouseover", function (e) {
   preview.classList.add("visible");
   previewVisible = true;
 });
-
 document.addEventListener("mouseout", function (e) {
   var link = e.target.closest("[data-thumb]");
   if (!link) return;
@@ -73,168 +118,209 @@ document.addEventListener("mouseout", function (e) {
   previewVisible = false;
   previewImg.src = "";
 });
-
 document.addEventListener("mousemove", function (e) {
   if (!previewVisible) return;
   var x = e.clientX + 16;
   var y = e.clientY + 16;
-  var pw = 324;
-  var ph = 184;
-  if (x + pw > window.innerWidth) x = e.clientX - pw - 8;
-  if (y + ph > window.innerHeight) y = e.clientY - ph - 8;
+  if (x + 330 > window.innerWidth) x = e.clientX - 330;
+  if (y + 190 > window.innerHeight) y = e.clientY - 190;
   preview.style.left = x + "px";
   preview.style.top = y + "px";
 });
 
-/* ===== Render Helpers ===== */
-function renderSection(title, items, renderItemFn) {
-  var html = '<div class="section">';
-  html += '<h2 class="section-title">' + title + '</h2>';
-  for (var i = 0; i < items.length; i++) {
-    html += renderItemFn(items[i], i);
-  }
-  html += '</div>';
-  return html;
-}
+/* ===== Card Renderers (Video-style sections) ===== */
 
-/* ===== YouTube item ===== */
-function renderYouTubeItem(item, idx) {
-  var thumbAttr = item.thumbnail ? ' data-thumb="' + escAttr(item.thumbnail) + '"' : '';
-  var html = '<div class="list-item">';
-  html += '<span class="list-item-rank">' + item.rank + '</span>';
-  html += '<div class="list-item-content">';
-  html += '<a class="list-item-link" href="' + escAttr(item.url) + '" target="_blank" rel="noopener"' + thumbAttr + '>' + esc(item.title) + '</a>';
-  html += '<div class="list-item-meta">';
-  if (item.countries) {
-    html += '<span class="meta-badge countries">' + item.countries + ' countries</span>';
-  }
-  if (item.views) {
-    html += '<span class="meta-badge views">' + esc(item.views) + '</span>';
-  }
-  if (item.highlights) {
-    html += '<span class="meta-badge domain">' + esc(item.highlights) + '</span>';
-  }
-  if (item.channel) {
-    html += '<span class="meta-badge channel">' + esc(item.channel) + '</span>';
-  }
-  html += '</div>';
-  html += '</div></div>';
-  return html;
-}
-
-/* ===== Shorts item ===== */
-function renderShortsItem(item, idx) {
-  var thumbAttr = item.thumbnail ? ' data-thumb="' + escAttr(item.thumbnail) + '"' : '';
-  var html = '<div class="list-item">';
-  html += '<span class="list-item-rank">' + item.rank + '</span>';
-  html += '<div class="list-item-content">';
-  html += '<a class="list-item-link" href="' + escAttr(item.url) + '" target="_blank" rel="noopener"' + thumbAttr + '>' + esc(item.title) + '</a>';
-  html += '<div class="list-item-meta">';
-  if (item.views) html += '<span class="meta-badge views">' + esc(item.views) + ' views</span>';
-  if (item.channel) html += '<span class="meta-badge channel">' + esc(item.channel) + '</span>';
-  html += '</div>';
-  html += '</div></div>';
-  return html;
-}
-
-/* ===== TikTok item ===== */
-function renderTikTokItem(item, idx) {
-  var html = '<div class="list-item">';
-  html += '<span class="list-item-rank">' + item.rank + '</span>';
-  html += '<div class="list-item-content">';
-  html += '<a class="list-item-link" href="' + escAttr(item.url) + '" target="_blank" rel="noopener">' + esc(item.title) + '</a>';
-  html += '<div class="list-item-meta">';
-  if (item.views) html += '<span class="meta-badge views">' + esc(item.views) + ' views</span>';
-  if (item.creator) html += '<span class="meta-badge creator">' + esc(item.creator) + '</span>';
-  html += '</div>';
-  html += '</div></div>';
-  return html;
-}
-
-/* ===== Instagram item ===== */
-function renderInstagramItem(item, idx) {
-  var html = '<div class="list-item">';
-  html += '<span class="list-item-rank">' + item.rank + '</span>';
-  html += '<div class="list-item-content">';
-  html += '<a class="list-item-link" href="' + escAttr(item.url) + '" target="_blank" rel="noopener">' + esc(item.title) + '</a>';
-  html += '<div class="list-item-meta">';
-  if (item.views) html += '<span class="meta-badge views">' + esc(item.views) + '</span>';
-  if (item.creator) html += '<span class="meta-badge creator">' + esc(item.creator) + '</span>';
-  html += '</div>';
-  html += '</div></div>';
-  return html;
-}
-
-/* ===== Reddit item ===== */
-function renderRedditItem(item, idx) {
-  var thumbAttr = '';
-  if (item.thumbnail && item.thumbnail.length > 10 && (item.thumbnail.indexOf("redd.it") !== -1)) {
+function renderRedditCard(item) {
+  var thumbAttr = "";
+  var thumbSrc = "";
+  if (item.thumbnail && item.thumbnail.length > 10) {
     thumbAttr = ' data-thumb="' + escAttr(item.thumbnail) + '"';
+    thumbSrc = item.thumbnail;
   }
-  var html = '<div class="list-item">';
-  html += '<span class="list-item-rank">' + item.rank + '</span>';
-  html += '<div class="list-item-content">';
-  html += '<a class="list-item-link" href="' + escAttr(item.url) + '" target="_blank" rel="noopener"' + thumbAttr + '>' + esc(item.title) + '</a>';
-  html += '<div class="list-item-meta">';
-  if (item.subreddit) html += '<span class="meta-badge subreddit">' + esc(item.subreddit) + '</span>';
-  if (item.upvotes) html += '<span class="meta-badge upvotes">' + esc(item.upvotes) + '</span>';
-  if (item.comments) html += '<span class="meta-badge domain">' + esc(item.comments) + ' comments</span>';
+  var html = '<div class="post-card">';
+  html += '<div class="post-rank-col"><span class="post-rank-num">' + item.rank + '</span>';
+  if (item.upvotes) html += '<span class="post-score">' + esc(item.upvotes) + '</span>';
   html += '</div>';
-  html += '</div></div>';
+  if (thumbSrc) {
+    html += '<div class="post-thumb-col"><a href="' + escAttr(item.url) + '" target="_blank" rel="noopener"' + thumbAttr + '>';
+    html += '<img src="' + escAttr(thumbSrc) + '" alt="" loading="lazy" onerror="this.parentElement.parentElement.style.display=\'none\'">';
+    html += '</a></div>';
+  }
+  html += '<div class="post-content-col">';
+  html += '<a class="post-title" href="' + escAttr(item.url) + '" target="_blank" rel="noopener">' + esc(item.title) + '</a>';
+  html += '<div class="post-meta">';
+  if (item.subreddit) html += '<span class="meta-tag subreddit">' + esc(item.subreddit) + '</span>';
+  if (item.comments) html += '<span class="meta-tag">' + esc(item.comments) + ' comments</span>';
+  html += '</div></div></div>';
   return html;
 }
 
-/* ===== HackerNews item ===== */
-function renderHNItem(item, idx) {
-  var html = '<div class="list-item">';
-  html += '<span class="list-item-rank">' + item.rank + '</span>';
-  html += '<div class="list-item-content">';
-  html += '<a class="list-item-link" href="' + escAttr(item.url) + '" target="_blank" rel="noopener">' + esc(item.title) + '</a>';
-  html += '<div class="list-item-meta">';
-  if (item.points) html += '<span class="meta-badge points">' + esc(item.points) + ' pts</span>';
-  if (item.comments) html += '<span class="meta-badge domain">' + esc(item.comments) + ' comments</span>';
-  if (item.domain) html += '<span class="meta-badge domain">' + esc(item.domain) + '</span>';
-  html += '</div>';
-  html += '</div></div>';
+function renderYouTubeCard(item) {
+  var thumbAttr = item.thumbnail ? ' data-thumb="' + escAttr(item.thumbnail) + '"' : '';
+  var thumbSrc = item.thumbnail || '';
+  var html = '<div class="post-card">';
+  html += '<div class="post-rank-col"><span class="post-rank-num">' + item.rank + '</span></div>';
+  if (thumbSrc) {
+    html += '<div class="post-thumb-col"><a href="' + escAttr(item.url) + '" target="_blank" rel="noopener"' + thumbAttr + '>';
+    html += '<img src="' + escAttr(thumbSrc) + '" alt="" loading="lazy">';
+    html += '<span class="play-overlay"></span>';
+    html += '</a></div>';
+  }
+  html += '<div class="post-content-col">';
+  html += '<a class="post-title" href="' + escAttr(item.url) + '" target="_blank" rel="noopener">' + esc(item.title) + '</a>';
+  html += '<div class="post-meta">';
+  if (item.countries) html += '<span class="meta-tag countries">' + item.countries + ' countries</span>';
+  if (item.highlights) html += '<span class="meta-tag">' + esc(item.highlights) + '</span>';
+  html += '</div></div></div>';
   return html;
 }
 
-/* ===== Pirate Bay item ===== */
-function renderTPBItem(item, idx) {
-  var html = '<div class="list-item">';
-  html += '<span class="list-item-rank">' + item.rank + '</span>';
-  html += '<div class="list-item-content">';
-  html += '<a class="list-item-link" href="' + escAttr(item.url) + '" target="_blank" rel="noopener">' + esc(item.title) + '</a>';
-  html += '<div class="list-item-meta">';
-  if (item.seeders) html += '<span class="meta-badge seeders">SE: ' + esc(item.seeders) + '</span>';
-  if (item.leechers) html += '<span class="meta-badge leechers">LE: ' + esc(item.leechers) + '</span>';
-  if (item.size) html += '<span class="meta-badge size">' + esc(item.size) + '</span>';
-  if (item.category) html += '<span class="meta-badge category">' + esc(item.category) + '</span>';
-  html += '</div>';
-  html += '</div></div>';
+function renderShortsCard(item) {
+  var thumbAttr = item.thumbnail ? ' data-thumb="' + escAttr(item.thumbnail) + '"' : '';
+  var thumbSrc = item.thumbnail || '';
+  var html = '<div class="post-card">';
+  html += '<div class="post-rank-col"><span class="post-rank-num">' + item.rank + '</span></div>';
+  if (thumbSrc) {
+    html += '<div class="post-thumb-col"><a href="' + escAttr(item.url) + '" target="_blank" rel="noopener"' + thumbAttr + '>';
+    html += '<img src="' + escAttr(thumbSrc) + '" alt="" loading="lazy">';
+    html += '<span class="play-overlay"></span>';
+    if (item.views) html += '<span class="views-badge">' + esc(item.views) + '</span>';
+    html += '</a></div>';
+  }
+  html += '<div class="post-content-col">';
+  html += '<a class="post-title" href="' + escAttr(item.url) + '" target="_blank" rel="noopener">' + esc(item.title) + '</a>';
+  html += '<div class="post-meta">';
+  if (item.channel) html += '<span class="meta-tag creator">' + esc(item.channel) + '</span>';
+  if (item.views) html += '<span class="meta-tag views">' + esc(item.views) + ' views</span>';
+  html += '</div></div></div>';
   return html;
 }
 
-/* ===== Build Full Page ===== */
-function render() {
-  var content = document.getElementById("content");
-  var leftCol = '';
-  var rightCol = '';
-
-  // LEFT column
-  leftCol += renderSection("/r/all - Top Today", TRENDING_DATA.reddit || [], renderRedditItem);
-  leftCol += renderSection("YouTube - Most Popular Worldwide", TRENDING_DATA.youtube || [], renderYouTubeItem);
-  leftCol += renderSection("YouTube Shorts", TRENDING_DATA.shorts || [], renderShortsItem);
-  leftCol += renderSection("TikTok Trending", TRENDING_DATA.tiktok || [], renderTikTokItem);
-
-  // RIGHT column
-  rightCol += renderSection("HackerNews", TRENDING_DATA.hackernews || [], renderHNItem);
-  rightCol += renderSection("Pirate Bay - Top 48h", TRENDING_DATA.piratebay || [], renderTPBItem);
-  rightCol += renderSection("Instagram Reels", TRENDING_DATA.instagram || [], renderInstagramItem);
-
-  content.innerHTML =
-    '<div class="col col-left">' + leftCol + '</div>' +
-    '<div class="col col-right">' + rightCol + '</div>';
+function renderTikTokCard(item) {
+  var thumbSrc = item.thumbnail || '';
+  var html = '<div class="post-card">';
+  html += '<div class="post-rank-col"><span class="post-rank-num">' + item.rank + '</span></div>';
+  if (thumbSrc) {
+    html += '<div class="post-thumb-col"><a href="' + escAttr(item.url) + '" target="_blank" rel="noopener">';
+    html += '<img src="' + escAttr(thumbSrc) + '" alt="" loading="lazy">';
+    html += '<span class="play-overlay"></span>';
+    if (item.views) html += '<span class="views-badge">' + esc(item.views) + '</span>';
+    html += '</a></div>';
+  }
+  html += '<div class="post-content-col">';
+  html += '<a class="post-title" href="' + escAttr(item.url) + '" target="_blank" rel="noopener">' + esc(item.title) + '</a>';
+  html += '<div class="post-meta">';
+  if (item.creator) html += '<span class="meta-tag creator">' + esc(item.creator) + '</span>';
+  if (item.views) html += '<span class="meta-tag views">' + esc(item.views) + ' views</span>';
+  html += '</div></div></div>';
+  return html;
 }
 
-render();
+function renderInstagramCard(item) {
+  var thumbSrc = item.thumbnail || '';
+  var html = '<div class="post-card">';
+  html += '<div class="post-rank-col"><span class="post-rank-num">' + item.rank + '</span></div>';
+  if (thumbSrc) {
+    html += '<div class="post-thumb-col"><a href="' + escAttr(item.url) + '" target="_blank" rel="noopener">';
+    html += '<img src="' + escAttr(thumbSrc) + '" alt="" loading="lazy">';
+    html += '</a></div>';
+  }
+  html += '<div class="post-content-col">';
+  html += '<a class="post-title" href="' + escAttr(item.url) + '" target="_blank" rel="noopener">' + esc(item.title) + '</a>';
+  html += '<div class="post-meta">';
+  if (item.creator) html += '<span class="meta-tag creator">' + esc(item.creator) + '</span>';
+  if (item.views) html += '<span class="meta-tag views">' + esc(item.views) + '</span>';
+  html += '</div></div></div>';
+  return html;
+}
+
+/* ===== Table Renderers (List-style sections) ===== */
+
+function renderHNTable(items) {
+  var html = '<table class="list-table">';
+  html += '<thead><tr>';
+  html += '<th class="col-num">#</th>';
+  html += '<th>Title</th>';
+  html += '<th class="col-pts">Points</th>';
+  html += '<th class="col-cmt">Comments</th>';
+  html += '<th class="col-domain">Domain</th>';
+  html += '</tr></thead><tbody>';
+  for (var i = 0; i < items.length; i++) {
+    var it = items[i];
+    html += '<tr>';
+    html += '<td class="col-num">' + it.rank + '</td>';
+    html += '<td><a href="' + escAttr(it.url) + '" target="_blank" rel="noopener">' + esc(it.title) + '</a></td>';
+    html += '<td class="col-pts">' + esc(it.points) + '</td>';
+    html += '<td class="col-cmt">' + esc(it.comments) + '</td>';
+    html += '<td class="col-domain">' + esc(it.domain || '') + '</td>';
+    html += '</tr>';
+  }
+  html += '</tbody></table>';
+  return html;
+}
+
+function renderTPBTable(items) {
+  var html = '<table class="list-table">';
+  html += '<thead><tr>';
+  html += '<th class="col-num">#</th>';
+  html += '<th>Name</th>';
+  html += '<th class="col-se">SE</th>';
+  html += '<th class="col-le">LE</th>';
+  html += '<th class="col-size">Size</th>';
+  html += '<th class="col-cat">Category</th>';
+  html += '</tr></thead><tbody>';
+  for (var i = 0; i < items.length; i++) {
+    var it = items[i];
+    html += '<tr>';
+    html += '<td class="col-num">' + it.rank + '</td>';
+    html += '<td><a href="' + escAttr(it.url) + '" target="_blank" rel="noopener">' + esc(it.title) + '</a></td>';
+    html += '<td class="col-se">' + esc(it.seeders) + '</td>';
+    html += '<td class="col-le">' + esc(it.leechers) + '</td>';
+    html += '<td class="col-size">' + esc(it.size) + '</td>';
+    html += '<td class="col-cat">' + esc(it.category) + '</td>';
+    html += '</tr>';
+  }
+  html += '</tbody></table>';
+  return html;
+}
+
+/* ===== Feed Renderer ===== */
+function renderFeed() {
+  var sec = null;
+  for (var i = 0; i < SECTIONS.length; i++) {
+    if (SECTIONS[i].key === activeSection) { sec = SECTIONS[i]; break; }
+  }
+  if (!sec) return;
+
+  var data = TRENDING_DATA[sec.key] || [];
+  document.getElementById("feedTitle").textContent = sec.icon + " " + sec.label;
+  document.getElementById("feedCount").textContent = data.length + " items";
+
+  var container = document.getElementById("feedContent");
+  var html = "";
+
+  if (sec.type === "list") {
+    if (sec.key === "hackernews") {
+      html = renderHNTable(data);
+    } else if (sec.key === "piratebay") {
+      html = renderTPBTable(data);
+    }
+  } else {
+    for (var j = 0; j < data.length; j++) {
+      switch (sec.key) {
+        case "reddit":    html += renderRedditCard(data[j]); break;
+        case "youtube":   html += renderYouTubeCard(data[j]); break;
+        case "shorts":    html += renderShortsCard(data[j]); break;
+        case "tiktok":    html += renderTikTokCard(data[j]); break;
+        case "instagram": html += renderInstagramCard(data[j]); break;
+      }
+    }
+  }
+
+  container.innerHTML = html;
+  container.scrollTop = 0;
+}
+
+/* ===== Init ===== */
+buildNav();
+renderFeed();
