@@ -21,63 +21,34 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Daily Trending — Top Content Across Platforms</title>
-<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,600,700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./style.css">
 </head>
 <body>
   <header class="header">
     <div class="header-inner">
-      <div class="logo-area">
-        <svg class="logo-icon" width="28" height="28" viewBox="0 0 28 28" fill="none" aria-label="Daily Trending logo">
-          <rect x="2" y="2" width="24" height="24" rx="6" stroke="currentColor" stroke-width="2"/>
-          <path d="M9 18V12M14 18V8M19 18V14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-        </svg>
-        <h1 class="logo-text">Daily Trending</h1>
-      </div>
+      <h1 class="logo-text">Daily Trending</h1>
       <div class="header-right">
         <time class="date-label" id="dateLabel"></time>
         <button data-theme-toggle aria-label="Switch to dark mode" class="theme-btn">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
         </button>
       </div>
     </div>
   </header>
 
-  <nav class="tabs" role="tablist" aria-label="Platform tabs">
-    <button class="tab active" role="tab" aria-selected="true" data-tab="youtube">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
-      YouTube
-    </button>
-    <button class="tab" role="tab" aria-selected="false" data-tab="shorts">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M10 14.65v-5.3L15 12l-5 2.65zm7.77-4.33-1.2-.5L18 9.06c1.8-.83 1.8-3.29 0-4.12L14.22 3.1a2.93 2.93 0 0 0-4.44 0L6 4.94c-1.8.83-1.8 3.29 0 4.12l1.43.76-1.2.5L4 11.06c-1.8.83-1.8 3.29 0 4.12l3.78 1.84a2.93 2.93 0 0 0 4.44 0L16 15.18c1.8-.83 1.8-3.29 0-4.12z"/></svg>
-      Shorts
-    </button>
-    <button class="tab" role="tab" aria-selected="false" data-tab="tiktok">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1 0-5.78c.27 0 .54.04.8.1v-3.5a6.37 6.37 0 0 0-.8-.05A6.34 6.34 0 0 0 3.15 15.3a6.34 6.34 0 0 0 10.86 4.43V13.5a8.27 8.27 0 0 0 5.58 2.17V12.2a4.83 4.83 0 0 1-3.77-1.74V6.69z"/></svg>
-      TikTok
-    </button>
-    <button class="tab" role="tab" aria-selected="false" data-tab="instagram">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/></svg>
-      Reels
-    </button>
-    <button class="tab" role="tab" aria-selected="false" data-tab="reddit">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 13.28c.04.18.06.36.06.55 0 2.82-3.28 5.1-7.32 5.1s-7.32-2.28-7.32-5.1c0-.19.02-.37.06-.55a1.76 1.76 0 0 1-.98-1.57c0-.97.79-1.76 1.76-1.76.45 0 .86.17 1.17.45 1.15-.83 2.74-1.37 4.51-1.43l.75-3.54a.34.34 0 0 1 .4-.27l2.49.53a1.23 1.23 0 1 1-.13.61l-2.22-.47-.67 3.14c1.75.07 3.31.61 4.44 1.43.31-.28.72-.45 1.17-.45.97 0 1.76.79 1.76 1.76 0 .65-.36 1.22-.93 1.52zM9.25 12a1.25 1.25 0 1 0 0 2.5 1.25 1.25 0 0 0 0-2.5zm5.5 0a1.25 1.25 0 1 0 0 2.5 1.25 1.25 0 0 0 0-2.5zm-5.47 3.99a.33.33 0 0 0 .47 0c.44-.44 1.08-.66 1.75-.66s1.31.22 1.75.66a.33.33 0 0 0 .47-.47c-.57-.57-1.35-.89-2.22-.89s-1.65.32-2.22.89a.33.33 0 0 0 0 .47z"/></svg>
-      Reddit
-    </button>
-    <button class="tab" role="tab" aria-selected="false" data-tab="hackernews">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M0 0v24h24V0H0zm12.8 13.4V19h-1.6v-5.6L7.1 5h1.8l3 5.6L15 5h1.8l-4 8.4z"/></svg>
-      Hacker News
-    </button>
-  </nav>
-
-  <main class="content" id="content">
+  <main class="columns" id="content">
     <!-- Content injected by JS -->
   </main>
 
   <footer class="footer">
-    <p>Updated daily at 9:00 AM (Riyadh) &middot; Data collected from public trending feeds</p>
+    <p>Updated daily at 9:00 AM (Riyadh)</p>
     <a href="https://www.perplexity.ai/computer" target="_blank" rel="noopener noreferrer">Created with Perplexity Computer</a>
   </footer>
+
+  <!-- Thumbnail preview tooltip -->
+  <div class="thumb-preview" id="thumbPreview">
+    <img id="thumbPreviewImg" src="" alt="">
+  </div>
 
   <script src="./data.js"></script>
   <script src="./app.js"></script>
