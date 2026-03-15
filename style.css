@@ -3,10 +3,10 @@
 
 :root {
   --bg: #dae0e6;
-  --sidebar-bg: #1a1a1b;
-  --sidebar-text: #d7dadc;
-  --sidebar-hover: #2a2a2b;
-  --sidebar-active: #343536;
+  --sidebar-bg: #6b7280;
+  --sidebar-text: #f3f4f6;
+  --sidebar-hover: #7c8490;
+  --sidebar-active: #4b5563;
   --sidebar-accent: #ff4500;
   --feed-bg: #ffffff;
   --feed-border: #ccc;
@@ -31,10 +31,10 @@
 
 [data-theme="dark"] {
   --bg: #030303;
-  --sidebar-bg: #1a1a1b;
-  --sidebar-text: #d7dadc;
-  --sidebar-hover: #272729;
-  --sidebar-active: #343536;
+  --sidebar-bg: #4b5563;
+  --sidebar-text: #f3f4f6;
+  --sidebar-hover: #5b6370;
+  --sidebar-active: #374151;
   --feed-bg: #1a1a1b;
   --feed-border: #343536;
   --text-primary: #d7dadc;
@@ -84,7 +84,7 @@ body {
 
 .sidebar-header {
   padding: 20px 16px 12px;
-  border-bottom: 1px solid #343536;
+  border-bottom: 1px solid rgba(255,255,255,0.15);
 }
 
 .logo {
@@ -146,8 +146,8 @@ body {
 .nav-badge {
   margin-left: auto;
   font-size: 0.7rem;
-  background: #343536;
-  color: #818384;
+  background: rgba(0,0,0,0.2);
+  color: rgba(255,255,255,0.7);
   padding: 2px 6px;
   border-radius: 10px;
   flex-shrink: 0;
@@ -155,12 +155,12 @@ body {
 
 .sidebar-footer {
   padding: 12px 16px;
-  border-top: 1px solid #343536;
+  border-top: 1px solid rgba(255,255,255,0.15);
 }
 
 .sidebar-footer button {
   background: none;
-  border: 1px solid #343536;
+  border: 1px solid rgba(255,255,255,0.25);
   color: var(--sidebar-text);
   padding: 6px 12px;
   border-radius: 20px;
@@ -340,6 +340,100 @@ body {
 .meta-tag.countries { color: #e07000; font-weight: 600; }
 .meta-tag.views { color: var(--upvote); font-weight: 600; }
 .meta-tag.creator { color: var(--text-secondary); }
+
+/* ===== Big Thumbnail Card (YouTube, Shorts, TikTok, Reels) ===== */
+.big-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  margin-bottom: 14px;
+  overflow: hidden;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.big-card:hover {
+  border-color: var(--text-secondary);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.big-card-thumb {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16/9;
+  background: #000;
+  overflow: hidden;
+  display: block;
+}
+.big-card-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.big-card-thumb .play-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 54px;
+  height: 54px;
+  background: rgba(0,0,0,0.55);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.big-card:hover .play-overlay { opacity: 1; }
+.big-card-thumb .play-overlay::after {
+  content: '';
+  display: block;
+  width: 0;
+  height: 0;
+  border-top: 12px solid transparent;
+  border-bottom: 12px solid transparent;
+  border-left: 20px solid #fff;
+  margin-left: 3px;
+}
+.big-card-thumb .views-badge {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  background: rgba(0,0,0,0.8);
+  color: #fff;
+  font-size: 0.75rem;
+  padding: 2px 8px;
+  border-radius: 3px;
+  font-weight: 600;
+}
+.big-card-thumb .rank-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: rgba(0,0,0,0.7);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.big-card-body {
+  padding: 10px 14px 12px;
+}
+.big-card-body .post-title {
+  font-size: 1rem;
+  font-weight: 600;
+  -webkit-line-clamp: 2;
+}
+.big-card-body .post-meta {
+  margin-top: 5px;
+}
 
 /* ===== Table/List View (Pirate Bay / HackerNews style) ===== */
 .list-table {

@@ -36,11 +36,11 @@ var _store = {
 
 /* ===== Section Definitions ===== */
 var SECTIONS = [
-  { key: "reddit",     label: "/r/all",              icon: "🔥", type: "video" },
-  { key: "youtube",    label: "YouTube Top",          icon: "▶",  type: "video" },
-  { key: "shorts",     label: "YouTube Shorts",       icon: "📱", type: "video" },
-  { key: "tiktok",     label: "TikTok",               icon: "🎵", type: "video" },
-  { key: "instagram",  label: "Instagram Reels",      icon: "📷", type: "video" },
+  { key: "reddit",     label: "/r/all",              icon: "🔥", type: "cards" },
+  { key: "youtube",    label: "YouTube Top",          icon: "▶",  type: "bigvideo" },
+  { key: "shorts",     label: "YouTube Shorts",       icon: "📱", type: "bigvideo" },
+  { key: "tiktok",     label: "TikTok",               icon: "🎵", type: "bigvideo" },
+  { key: "instagram",  label: "Instagram Reels",      icon: "📷", type: "bigvideo" },
   { key: "hackernews", label: "Hacker News",          icon: "📰", type: "list"  },
   { key: "piratebay",  label: "Pirate Bay Top 48h",   icon: "🏴", type: "list"  }
 ];
@@ -156,17 +156,14 @@ function renderRedditCard(item) {
 }
 
 function renderYouTubeCard(item) {
-  var thumbAttr = item.thumbnail ? ' data-thumb="' + escAttr(item.thumbnail) + '"' : '';
   var thumbSrc = item.thumbnail || '';
-  var html = '<div class="post-card">';
-  html += '<div class="post-rank-col"><span class="post-rank-num">' + item.rank + '</span></div>';
-  if (thumbSrc) {
-    html += '<div class="post-thumb-col"><a href="' + escAttr(item.url) + '" target="_blank" rel="noopener"' + thumbAttr + '>';
-    html += '<img src="' + escAttr(thumbSrc) + '" alt="" loading="lazy">';
-    html += '<span class="play-overlay"></span>';
-    html += '</a></div>';
-  }
-  html += '<div class="post-content-col">';
+  var html = '<div class="big-card">';
+  html += '<a class="big-card-thumb" href="' + escAttr(item.url) + '" target="_blank" rel="noopener">';
+  if (thumbSrc) html += '<img src="' + escAttr(thumbSrc) + '" alt="" loading="lazy">';
+  html += '<span class="play-overlay"></span>';
+  html += '<span class="rank-badge">' + item.rank + '</span>';
+  html += '</a>';
+  html += '<div class="big-card-body">';
   html += '<a class="post-title" href="' + escAttr(item.url) + '" target="_blank" rel="noopener">' + esc(item.title) + '</a>';
   html += '<div class="post-meta">';
   if (item.countries) html += '<span class="meta-tag countries">' + item.countries + ' countries</span>';
@@ -176,18 +173,15 @@ function renderYouTubeCard(item) {
 }
 
 function renderShortsCard(item) {
-  var thumbAttr = item.thumbnail ? ' data-thumb="' + escAttr(item.thumbnail) + '"' : '';
   var thumbSrc = item.thumbnail || '';
-  var html = '<div class="post-card">';
-  html += '<div class="post-rank-col"><span class="post-rank-num">' + item.rank + '</span></div>';
-  if (thumbSrc) {
-    html += '<div class="post-thumb-col"><a href="' + escAttr(item.url) + '" target="_blank" rel="noopener"' + thumbAttr + '>';
-    html += '<img src="' + escAttr(thumbSrc) + '" alt="" loading="lazy">';
-    html += '<span class="play-overlay"></span>';
-    if (item.views) html += '<span class="views-badge">' + esc(item.views) + '</span>';
-    html += '</a></div>';
-  }
-  html += '<div class="post-content-col">';
+  var html = '<div class="big-card">';
+  html += '<a class="big-card-thumb" href="' + escAttr(item.url) + '" target="_blank" rel="noopener">';
+  if (thumbSrc) html += '<img src="' + escAttr(thumbSrc) + '" alt="" loading="lazy">';
+  html += '<span class="play-overlay"></span>';
+  html += '<span class="rank-badge">' + item.rank + '</span>';
+  if (item.views) html += '<span class="views-badge">' + esc(item.views) + ' views</span>';
+  html += '</a>';
+  html += '<div class="big-card-body">';
   html += '<a class="post-title" href="' + escAttr(item.url) + '" target="_blank" rel="noopener">' + esc(item.title) + '</a>';
   html += '<div class="post-meta">';
   if (item.channel) html += '<span class="meta-tag creator">' + esc(item.channel) + '</span>';
@@ -198,16 +192,14 @@ function renderShortsCard(item) {
 
 function renderTikTokCard(item) {
   var thumbSrc = item.thumbnail || '';
-  var html = '<div class="post-card">';
-  html += '<div class="post-rank-col"><span class="post-rank-num">' + item.rank + '</span></div>';
-  if (thumbSrc) {
-    html += '<div class="post-thumb-col"><a href="' + escAttr(item.url) + '" target="_blank" rel="noopener">';
-    html += '<img src="' + escAttr(thumbSrc) + '" alt="" loading="lazy">';
-    html += '<span class="play-overlay"></span>';
-    if (item.views) html += '<span class="views-badge">' + esc(item.views) + '</span>';
-    html += '</a></div>';
-  }
-  html += '<div class="post-content-col">';
+  var html = '<div class="big-card">';
+  html += '<a class="big-card-thumb" href="' + escAttr(item.url) + '" target="_blank" rel="noopener">';
+  if (thumbSrc) html += '<img src="' + escAttr(thumbSrc) + '" alt="" loading="lazy">';
+  html += '<span class="play-overlay"></span>';
+  html += '<span class="rank-badge">' + item.rank + '</span>';
+  if (item.views) html += '<span class="views-badge">' + esc(item.views) + ' views</span>';
+  html += '</a>';
+  html += '<div class="big-card-body">';
   html += '<a class="post-title" href="' + escAttr(item.url) + '" target="_blank" rel="noopener">' + esc(item.title) + '</a>';
   html += '<div class="post-meta">';
   if (item.creator) html += '<span class="meta-tag creator">' + esc(item.creator) + '</span>';
@@ -218,14 +210,13 @@ function renderTikTokCard(item) {
 
 function renderInstagramCard(item) {
   var thumbSrc = item.thumbnail || '';
-  var html = '<div class="post-card">';
-  html += '<div class="post-rank-col"><span class="post-rank-num">' + item.rank + '</span></div>';
-  if (thumbSrc) {
-    html += '<div class="post-thumb-col"><a href="' + escAttr(item.url) + '" target="_blank" rel="noopener">';
-    html += '<img src="' + escAttr(thumbSrc) + '" alt="" loading="lazy">';
-    html += '</a></div>';
-  }
-  html += '<div class="post-content-col">';
+  var html = '<div class="big-card">';
+  html += '<a class="big-card-thumb" href="' + escAttr(item.url) + '" target="_blank" rel="noopener">';
+  if (thumbSrc) html += '<img src="' + escAttr(thumbSrc) + '" alt="" loading="lazy">';
+  html += '<span class="play-overlay"></span>';
+  html += '<span class="rank-badge">' + item.rank + '</span>';
+  html += '</a>';
+  html += '<div class="big-card-body">';
   html += '<a class="post-title" href="' + escAttr(item.url) + '" target="_blank" rel="noopener">' + esc(item.title) + '</a>';
   html += '<div class="post-meta">';
   if (item.creator) html += '<span class="meta-tag creator">' + esc(item.creator) + '</span>';
@@ -305,10 +296,13 @@ function renderFeed() {
     } else if (sec.key === "piratebay") {
       html = renderTPBTable(data);
     }
-  } else {
+  } else if (sec.type === "cards") {
+    for (var j = 0; j < data.length; j++) {
+      html += renderRedditCard(data[j]);
+    }
+  } else if (sec.type === "bigvideo") {
     for (var j = 0; j < data.length; j++) {
       switch (sec.key) {
-        case "reddit":    html += renderRedditCard(data[j]); break;
         case "youtube":   html += renderYouTubeCard(data[j]); break;
         case "shorts":    html += renderShortsCard(data[j]); break;
         case "tiktok":    html += renderTikTokCard(data[j]); break;
